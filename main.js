@@ -20,6 +20,10 @@ var todoStorage = {
 // アプリケーションで使用したいデータは data オプションへ登録していきます。
 
 const app = new Vue({
+    el: '#app',
+    data: {
+        todos: []
+    },
     methods: {
         // ToDo 追加の処理
         doAdd: function(event, value) {
@@ -39,6 +43,29 @@ const app = new Vue({
             })
             // フォーム要素を空にする
             comment.value = ''
+        },
+        doChangeState: function(item) {
+            item.state = item.state ? 0 : 1
+        },
+        // 削除の処理
+        doRemove: function(item) {
+            var index = this.todos.indexOf(item)
+            this.todos.splice(index, 1)
         }
+    },
+    watch: {
+        // オプションを使う場合はオブジェクト形式にする
+        todos: {
+            // 引数はウォッチしているプロパティの変更後の値
+            handler: function(todos) {
+                todoStorage.save(todos)
+            },
+            // deep オプションでネストしているデータも監視できる
+            deep: true
+        }
+    },
+    created() {
+        // インスタンス作成時に自動的に fetch() する
+        this.todos = todoStorage.fetch()
     }
 })
